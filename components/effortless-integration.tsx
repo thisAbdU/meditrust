@@ -1,6 +1,6 @@
 import type React from "react"
 
-interface EffortlessIntegrationProps {
+interface IntegrationProps {
   /** Fixed width from Figma: 482px */
   width?: number | string
   /** Fixed height from Figma: 300px */
@@ -12,11 +12,11 @@ interface EffortlessIntegrationProps {
 }
 
 /**
- * Effortless Integration – Service integration constellation
+ *  Integration – Service integration constellation
  * Generated from Figma via MCP with exact measurements (482×300px)
  * Single-file component following the v0-ready pattern used in this repo.
  */
-const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({
+const Integration: React.FC<IntegrationProps> = ({
   width = 482,
   height = 300,
   className = "",
@@ -64,7 +64,7 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({
         } as React.CSSProperties
       }
       role="img"
-      aria-label="Effortless integration constellation with complex background patterns"
+      aria-label=" integration constellation with complex background patterns"
     >
       {/* Exact Figma structure with proper masking and background patterns */}
       
@@ -72,4 +72,4 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({
   )
 }
 
-export default EffortlessIntegration
+export default Integration

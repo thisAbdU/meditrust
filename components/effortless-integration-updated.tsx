@@ -1,6 +1,6 @@
 import type React from "react"
 
-interface EffortlessIntegrationProps {
+interface IntegrationProps {
   /** Fixed width from Figma: 482px */
   width?: number | string
   /** Fixed height from Figma: 300px */
@@ -10,10 +10,10 @@ interface EffortlessIntegrationProps {
 }
 
 /**
- * Effortless Integration – Service integration constellation
+ *  Integration – Service integration constellation
  * Three concentric rings with logos positioned on ring axes
  */
-const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 482, height = 300, className = "" }) => {
+const Integration: React.FC<IntegrationProps> = ({ width = 482, height = 300, className = "" }) => {
   const centerX = 250
   const centerY = 179
   const rings = [
@@ -407,4 +407,4 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
   )
 }
 
-export default EffortlessIntegration
+export default Integration

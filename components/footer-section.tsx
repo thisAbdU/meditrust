@@ -9,7 +9,7 @@ export default function FooterSection() {
             <div className="text-center text-[#49423D] text-xl font-semibold leading-4 font-sans">Brillance</div>
           </div>
           <div className="text-[rgba(73,66,61,0.90)] text-sm font-medium leading-[18px] font-sans">
-            Coding made effortless
+            Coding made 
           </div>
 
           {/* Social Media Icons */}
