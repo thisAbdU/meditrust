@@ -45,12 +45,12 @@ export default function PricingSection() {
 
           {/* Title */}
           <div className="self-stretch text-center flex justify-center flex-col text-[#49423D] text-3xl md:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-            Choose the perfect plan for your business
+            Choose the perfect plan for your healthcare practice
           </div>
 
           {/* Description */}
           <div className="self-stretch text-center text-[#605A57] text-base font-normal leading-7 font-sans">
-            Scale your operations with flexible pricing that grows with your team.
+            Secure prescription verification with flexible pricing that grows with your practice.
             <br />
             Start free, upgrade when you're ready.
           </div>
@@ -130,7 +130,7 @@ export default function PricingSection() {
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
                   <div className="text-[rgba(55,50,47,0.90)] text-lg font-medium leading-7 font-sans">Starter</div>
                   <div className="w-full max-w-[242px] text-[rgba(41,37,35,0.70)] text-sm font-normal leading-5 font-sans">
-                    Perfect for individuals and small teams getting started.
+                    Perfect for individual practitioners and small clinics getting started.
                   </div>
                 </div>
 
@@ -177,11 +177,11 @@ export default function PricingSection() {
 
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
                 {[
-                  "Up to 3 projects",
-                  "Basic documentation tools",
+                  "Up to 50 prescriptions/month",
+                  "Basic QR code generation",
                   "Community support",
-                  "Standard templates",
-                  "Basic analytics",
+                  "Standard verification templates",
+                  "Basic prescription analytics",
                 ].map((feature, index) => (
                   <div key={index} className="self-stretch flex justify-start items-center gap-[13px]">
                     <div className="w-4 h-4 relative flex items-center justify-center">
@@ -210,7 +210,7 @@ export default function PricingSection() {
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
                   <div className="text-[#FBFAF9] text-lg font-medium leading-7 font-sans">Professional</div>
                   <div className="w-full max-w-[242px] text-[#B2AEA9] text-sm font-normal leading-5 font-sans">
-                    Advanced features for growing teams and businesses.
+                    Advanced features for growing medical practices and healthcare systems.
                   </div>
                 </div>
 
@@ -258,14 +258,14 @@ export default function PricingSection() {
 
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
                 {[
-                  "Unlimited projects",
-                  "Advanced documentation tools",
+                  "Unlimited prescriptions",
+                  "Advanced blockchain verification",
                   "Priority support",
-                  "Custom templates",
-                  "Advanced analytics",
-                  "Team collaboration",
+                  "Custom prescription templates",
+                  "Advanced prescription analytics",
+                  "Multi-doctor collaboration",
                   "API access",
-                  "Custom integrations",
+                  "EHR integrations",
                 ].map((feature, index) => (
                   <div key={index} className="self-stretch flex justify-start items-center gap-[13px]">
                     <div className="w-4 h-4 relative flex items-center justify-center">
@@ -292,7 +292,7 @@ export default function PricingSection() {
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
                   <div className="text-[rgba(55,50,47,0.90)] text-lg font-medium leading-7 font-sans">Enterprise</div>
                   <div className="w-full max-w-[242px] text-[rgba(41,37,35,0.70)] text-sm font-normal leading-5 font-sans">
-                    Complete solution for large organizations and enterprises.
+                    Complete solution for large hospitals and healthcare networks.
                   </div>
                 </div>
 
@@ -340,12 +340,12 @@ export default function PricingSection() {
               <div className="self-stretch flex flex-col justify-start items-start gap-2">
                 {[
                   "Everything in Professional",
-                  "Dedicated account manager",
+                  "Dedicated healthcare account manager",
                   "24/7 phone support",
-                  "Custom onboarding",
+                  "Custom healthcare onboarding",
                   "Advanced security features",
                   "SSO integration",
-                  "Custom contracts",
+                  "Custom prescription workflows",
                   "White-label options",
                 ].map((feature, index) => (
                   <div key={index} className="self-stretch flex justify-start items-center gap-[13px]">

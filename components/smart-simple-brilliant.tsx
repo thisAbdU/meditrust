@@ -12,7 +12,7 @@ interface SmartSimpleBrilliantProps {
 }
 
 /**
- * Smart · Simple · Brilliant – Calendar cards
+ * Smart · Simple · Brilliant – Prescription verification workflow
  * Generated from Figma via MCP with exact measurements (482×300px)
  * Single-file component following the v0-ready pattern used in this repo.
  */
@@ -62,7 +62,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
         } as React.CSSProperties
       }
       role="img"
-      aria-label="Two calendar cards with colored event rows"
+      aria-label="Prescription verification workflow timeline"
     >
       <div
         style={{
@@ -119,7 +119,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
                     </div>
                   </div>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "9px", color: "#92400E" }}>
-                    1:1 with Heather
+                    Prescription Issued
                   </div>
                 </div>
               </div>
@@ -160,7 +160,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
                     </div>
                   </div>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "9px", color: "#0C4A6E" }}>
-                    Concept Design Review II
+                    QR Code Generated
                   </div>
                 </div>
               </div>
@@ -192,7 +192,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
                     </span>
                   </div>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "9px", color: "#064E3B" }}>
-                    Webinar: Figma ...
+                    Blockchain Recorded
                   </div>
                 </div>
               </div>
@@ -248,7 +248,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
                     </div>
                   </div>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "9px", color: "#581C87" }}>
-                    Onboarding Presentation
+                    Pharmacy Scan
                   </div>
                 </div>
               </div>
@@ -289,7 +289,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
                     </div>
                   </div>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "9px", color: "#BE123C" }}>
-                    🍷 Happy Hour
+                    ❌ Verification Failed
                   </div>
                 </div>
               </div>
@@ -321,7 +321,7 @@ const SmartSimpleBrilliant: React.FC<SmartSimpleBrilliantProps> = ({
                     </span>
                   </div>
                   <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "9px", color: "#581C87" }}>
-                    🍔 New Employee Welcome Lunch!
+                    ✅ Prescription Verified
                   </div>
                 </div>
               </div>

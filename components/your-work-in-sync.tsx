@@ -129,9 +129,9 @@ const YourWorkInSync: React.FC<YourWorkInSyncProps> = ({
                   color: theme === "light" ? "#37322f" : "var(--yws-text-primary)",
                   whiteSpace: "nowrap",
                 }}
-              >
-                Team updates flow seamlessly
-              </span>
+                >
+                  Prescription verification updates
+                </span>
             </div>
           </div>
 
@@ -169,9 +169,9 @@ const YourWorkInSync: React.FC<YourWorkInSyncProps> = ({
                   color: "#ffffff",
                   whiteSpace: "nowrap",
                 }}
-              >
-                Hi everyone
-              </span>
+                >
+                  Patient verification complete
+                </span>
             </div>
             {/* Avatar */}
             <div
@@ -236,9 +236,9 @@ const YourWorkInSync: React.FC<YourWorkInSyncProps> = ({
                   color: theme === "light" ? "#37322f" : "var(--yws-text-primary)",
                   whiteSpace: "nowrap",
                 }}
-              >
-                How about this instead?
-              </span>
+                >
+                  New prescription issued
+                </span>
             </div>
           </div>
 
@@ -277,9 +277,9 @@ const YourWorkInSync: React.FC<YourWorkInSyncProps> = ({
                   color: "#030712",
                   whiteSpace: "nowrap",
                 }}
-              >
-                Great work, everyone!
-              </span>
+                >
+                  All prescriptions verified!
+                </span>
             </div>
             {/* Send button */}
             <div

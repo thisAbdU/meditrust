@@ -61,7 +61,7 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
         } as React.CSSProperties
       }
       role="img"
-      aria-label="Financial dashboard showing invoiced revenue charts"
+      aria-label="Healthcare dashboard showing prescription verification metrics"
       data-name="Numbers that speak"
       data-node-id="454:5856"
     >
@@ -259,7 +259,7 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                               whiteSpace: "pre",
                             }}
                           >
-                            Invoiced Revenue
+                            Prescriptions Verified
                           </div>
                           <div
                             className="tracking-widest"
@@ -273,7 +273,7 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                               whiteSpace: "pre",
                             }}
                           >
-                            $317,731.00
+                            12,847
                           </div>
                         </div>
                       </div>
@@ -341,7 +341,7 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                                     boxSizing: "border-box",
                                   }}
                                 >
-                                  {["500k", "300k", "200k", "100k", "0"].map((label, index) => (
+                                  {["5k", "3k", "2k", "1k", "0"].map((label, index) => (
                                     <div
                                       key={index}
                                       style={{
@@ -462,8 +462,8 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                                     width: "100%",
                                   }}
                                 >
-                                  <div style={{ whiteSpace: "pre" }}>Aug 2023</div>
-                                  <div style={{ whiteSpace: "pre" }}>Aug 2024</div>
+                                  <div style={{ whiteSpace: "pre" }}>Jan 2024</div>
+                                  <div style={{ whiteSpace: "pre" }}>Dec 2024</div>
                                 </div>
                               </div>
                             </div>

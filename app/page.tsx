@@ -67,13 +67,13 @@ export default function LandingPage() {
   const getDashboardContent = () => {
     switch (activeCard) {
       case 0:
-        return <div className="text-[#828387] text-sm">Customer Subscription Status and Details</div>
+        return <div className="text-[#828387] text-sm">Prescription Verification Dashboard</div>
       case 1:
-        return <div className="text-[#828387] text-sm">Analytics Dashboard - Real-time Insights</div>
+        return <div className="text-[#828387] text-sm">Blockchain Analytics - Real-time Verification</div>
       case 2:
-        return <div className="text-[#828387] text-sm">Data Visualization - Charts and Metrics</div>
+        return <div className="text-[#828387] text-sm">Healthcare Metrics - Prescription Data</div>
       default:
-        return <div className="text-[#828387] text-sm">Customer Subscription Status and Details</div>
+        return <div className="text-[#828387] text-sm">Prescription Verification Dashboard</div>
     }
   }
 
@@ -97,13 +97,13 @@ export default function LandingPage() {
                 <div className="flex justify-center items-center">
                   <div className="flex justify-start items-center">
                     <div className="flex flex-col justify-center text-[#2F3037] text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-5 font-sans">
-                      Brillance
+                      MediTrust
                     </div>
                   </div>
                   <div className="pl-3 sm:pl-4 md:pl-5 lg:pl-5 flex justify-start items-start hidden sm:flex flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-4">
                     <div className="flex justify-start items-center">
                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
-                        Products
+                        Features
                       </div>
                     </div>
                     <div className="flex justify-start items-center">
@@ -133,14 +133,14 @@ export default function LandingPage() {
               <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                 <div className="self-stretch rounded-[3px] flex flex-col justify-center items-center gap-4 sm:gap-5 md:gap-6 lg:gap-8">
                   <div className="w-full max-w-[748.71px] lg:w-[748.71px] text-center flex justify-center flex-col text-[#37322F] text-[24px] xs:text-[28px] sm:text-[36px] md:text-[52px] lg:text-[80px] font-normal leading-[1.1] sm:leading-[1.15] md:leading-[1.2] lg:leading-24 font-serif px-2 sm:px-4 md:px-0">
-                    Effortless custom contract
+                    Verify Every Prescription.
                     <br />
-                    billing by Brillance
+                    Build Trust in Healthcare.
                   </div>
                   <div className="w-full max-w-[506.08px] lg:w-[506.08px] text-center flex justify-center flex-col text-[rgba(55,50,47,0.80)] sm:text-lg md:text-xl leading-[1.4] sm:leading-[1.45] md:leading-[1.5] lg:leading-7 font-sans px-2 sm:px-4 md:px-0 lg:text-lg font-medium text-sm">
-                    Streamline your billing process with seamless automation
+                    MediTrust is a blockchain-powered prescription verification system
                     <br className="hidden sm:block" />
-                    for every custom contract, tailored by Brillance.
+                    that protects patients from fake or tampered prescriptions.
                   </div>
                 </div>
               </div>
@@ -150,7 +150,7 @@ export default function LandingPage() {
                   <div className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#37322F] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center">
                     <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0)] to-[rgba(0,0,0,0.10)] mix-blend-multiply"></div>
                     <div className="flex flex-col justify-center text-white text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
-                      Start for free
+                      Try Demo
                     </div>
                   </div>
                 </div>
@@ -234,22 +234,22 @@ export default function LandingPage() {
                 <div className="flex-1 px-0 sm:px-2 md:px-0 flex flex-col md:flex-row justify-center items-stretch gap-0">
                   {/* Feature Cards */}
                   <FeatureCard
-                    title="Plan your schedules"
-                    description="Streamline customer subscriptions and billing with automated scheduling tools."
+                    title="Secure Prescription Issuance"
+                    description="Doctors can issue digital prescriptions that can't be forged or modified using blockchain technology."
                     isActive={activeCard === 0}
                     progress={activeCard === 0 ? progress : 0}
                     onClick={() => handleCardClick(0)}
                   />
                   <FeatureCard
-                    title="Analytics & insights"
-                    description="Transform your business data into actionable insights with real-time analytics."
+                    title="Instant Verification"
+                    description="Pharmacies verify prescription authenticity in seconds using QR code scanning technology."
                     isActive={activeCard === 1}
                     progress={activeCard === 1 ? progress : 0}
                     onClick={() => handleCardClick(1)}
                   />
                   <FeatureCard
-                    title="Collaborate seamlessly"
-                    description="Keep your team aligned with shared dashboards and collaborative workflows."
+                    title="Patient Ownership"
+                    description="Patients can safely access and manage their prescriptions with complete transparency."
                     isActive={activeCard === 2}
                     progress={activeCard === 2 ? progress : 0}
                     onClick={() => handleCardClick(2)}
@@ -293,12 +293,12 @@ export default function LandingPage() {
                       text="Social Proof"
                     />
                     <div className="w-full max-w-[472.55px] text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-                      Confidence backed by results
+                      Trusted by healthcare professionals
                     </div>
                     <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
-                      Our customers achieve more each day
+                      Healthcare providers trust MediTrust to protect patients
                       <br className="hidden sm:block" />
-                      because their tools are simple, powerful, and clear.
+                      with secure, tamper-proof prescription verification.
                     </div>
                   </div>
                 </div>
@@ -349,7 +349,7 @@ export default function LandingPage() {
                             <img src="/horizon-icon.svg" alt="Horizon" className="w-full h-full object-contain" />
                           </div>
                           <div className="text-center flex justify-center flex-col text-[#37322F] text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl font-medium leading-tight md:leading-9 font-sans">
-                            Acute
+                            MediTrust
                           </div>
                         </div>
                       )
@@ -387,12 +387,12 @@ export default function LandingPage() {
                       text="Bento grid"
                     />
                     <div className="w-full max-w-[598.06px] lg:w-[598.06px] text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-                      Built for absolute clarity and focused work
+                      Built for healthcare safety and transparency
                     </div>
                     <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
-                      Stay focused with tools that organize, connect
+                      Secure prescription verification that connects doctors, patients,
                       <br />
-                      and turn information into confident decisions.
+                      and pharmacies with blockchain technology.
                     </div>
                   </div>
                 </div>
@@ -419,7 +419,7 @@ export default function LandingPage() {
                           Smart. Simple. Brilliant.
                         </h3>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Your data is beautifully organized so you see everything clearly without the clutter.
+                          Prescription verification workflow is beautifully organized so you see everything clearly without the clutter.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex items-center justify-center overflow-hidden">
@@ -439,7 +439,7 @@ export default function LandingPage() {
                           Your work, in sync
                         </h3>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Every update flows instantly across your team and keeps collaboration effortless and fast.
+                          Every prescription verification flows instantly across the healthcare team and keeps collaboration effortless and fast.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden text-right items-center justify-center">
@@ -459,7 +459,7 @@ export default function LandingPage() {
                           Effortless integration
                         </h3>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          All your favorite tools connect in one place and work together seamlessly by design.
+                          All healthcare systems connect in one place and work together seamlessly with blockchain technology.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden justify-center items-center relative bg-transparent">
@@ -478,7 +478,7 @@ export default function LandingPage() {
                           Numbers that speak
                         </h3>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Track growth with precision and turn raw data into confident decisions you can trust.
+                          Track prescription verification with precision and turn healthcare data into confident decisions you can trust.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden items-center justify-center relative">

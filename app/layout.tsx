@@ -19,9 +19,9 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: "Brillance - Effortless Custom Contract Billing",
+  title: "MediTrust - Verify Every Prescription. Build Trust in Healthcare.",
   description:
-    "Streamline your billing process with seamless automation for every custom contract, tailored by Brillance.",
+    "MediTrust is a blockchain-powered prescription verification system that protects patients from fake or tampered prescriptions — ensuring safety, transparency, and trust across the healthcare chain.",
 }
 
 export default function RootLayout({
