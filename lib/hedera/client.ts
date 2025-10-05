@@ -11,7 +11,7 @@ export type HederaNetwork = keyof typeof HEDERA_NETWORKS
 
 // Create Hedera client
 export function createHederaClient(network: HederaNetwork = 'testnet') {
-  const client = Client.forNetwork(network)
+  const client = Client.forNetwork({ [network]: HEDERA_NETWORKS[network] })
   
   // Debug environment variables
   console.log('🔍 Checking Hedera environment variables:')

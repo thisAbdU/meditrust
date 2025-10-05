@@ -1,4 +1,5 @@
 // Hedera SDK exports and utilities
+import { AccountId, PrivateKey } from '@hashgraph/sdk'
 export { createHederaClient, getDefaultClient, createAccountClient, HEDERA_NETWORKS } from './client'
 export { HederaAccount } from './account'
 export { PrescriptionContract, PrescriptionVerification } from './contracts'

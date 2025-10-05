@@ -21,9 +21,9 @@ export interface BlockchainPrescriptionRecord {
   success: boolean
   message: string
   prescriptionData: PrescriptionData
-  transactionHash: string
+  transactionHash?: string
   timestamp: string
-  network: string
+  network?: string
 }
 
 // QR code data interface

@@ -332,6 +332,8 @@ export default function IssuePrescriptionForm() {
                 setFormData({
                   patientName: '',
                   patientId: '',
+                  patientEmail: '',
+                  patientPhone: '',
                   medicationName: '',
                   dosage: '',
                   duration: '',

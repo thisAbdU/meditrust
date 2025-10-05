@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const { PrescriptionUtils } = await import('@/lib/hedera')
     const prescriptionUtils = new PrescriptionUtils()
     const qrCodeUrl = await prescriptionUtils.generateQRCode(
-      result.transactionHash,
+      result.transactionHash || '',
       prescriptionData.prescriptionId
     )
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       duration: prescriptionData.duration,
       instructions: prescriptionData.instructions,
       qrCodeUrl: qrCodeUrl,
-      transactionHash: result.transactionHash,
+      transactionHash: result.transactionHash || '',
       verificationUrl
     }
 

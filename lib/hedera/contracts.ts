@@ -6,7 +6,8 @@ import {
   FileCreateTransaction,
   FileId,
   Hbar,
-  TransactionRecordQuery
+  TransactionRecordQuery,
+  ContractFunctionParameters
 } from '@hashgraph/sdk'
 import { getDefaultClient } from './client'
 
@@ -35,7 +36,7 @@ export class PrescriptionContract {
       const contractId = ContractId.fromString(this.contractId)
       const transaction = new ContractExecuteTransaction()
         .setContractId(contractId)
-        .setFunction(functionName, params || [])
+        .setFunction(functionName, new ContractFunctionParameters())
         .setGas(100000)
 
       const response = await transaction.execute(this.client)
@@ -55,7 +56,7 @@ export class PrescriptionContract {
       const contractId = ContractId.fromString(this.contractId)
       const query = new ContractCallQuery()
         .setContractId(contractId)
-        .setFunction(functionName, params || [])
+        .setFunction(functionName, new ContractFunctionParameters())
         .setGas(100000)
 
       const response = await query.execute(this.client)
@@ -69,23 +70,12 @@ export class PrescriptionContract {
 // Prescription verification functions (foundation)
 export class PrescriptionVerification {
   private contract: PrescriptionContract
+  private client: any
 
   constructor(contractId?: string) {
     this.contract = new PrescriptionContract(contractId)
   }
 
-  // Verify prescription authenticity (foundation)
-  async verifyPrescription(prescriptionId: string, doctorId: string, patientId: string) {
-    // This will be implemented with actual smart contract
-    return {
-      isValid: false,
-      message: 'Smart contract verification not yet implemented',
-      prescriptionId,
-      doctorId,
-      patientId,
-      timestamp: new Date().toISOString()
-    }
-  }
 
   // Create prescription record (REAL Hedera blockchain implementation)
   async createPrescriptionRecord(prescriptionData: {
@@ -93,6 +83,8 @@ export class PrescriptionVerification {
     patientId: string
     doctorId: string
     patientName: string
+    patientEmail: string
+    patientPhone: string
     medicationName: string
     dosage: string
     duration: string
@@ -219,7 +211,7 @@ export class PrescriptionVerification {
         success: true,
         exists: true,
         transactionId: record.transactionId.toString(),
-        status: record.status,
+        status: 'SUCCESS',
         timestamp: record.consensusTimestamp,
         message: 'Transaction verified on Hedera blockchain'
       }

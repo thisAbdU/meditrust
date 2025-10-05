@@ -264,11 +264,11 @@ export class OTPService {
   // Clean up expired OTPs (call this periodically)
   cleanupExpiredOTPs(): void {
     const now = Date.now()
-    for (const [otpId, otpData] of otpStore.entries()) {
+    otpStore.forEach((otpData, otpId) => {
       if (now > otpData.expiresAt) {
         otpStore.delete(otpId)
         console.log(`🧹 Cleaned up expired OTP: ${otpId}`)
       }
-    }
+    })
   }
 }

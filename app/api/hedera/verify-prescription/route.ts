@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
       success: true,
       verified: true,
       message: 'Prescription verified on blockchain',
-      prescriptionData: verificationResult.prescriptionData,
-      transactionDetails: verificationResult.transactionDetails,
+      prescriptionData: (verificationResult as any).prescriptionData,
+      transactionDetails: (verificationResult as any).transactionDetails,
       timestamp: new Date().toISOString()
     })
   } catch (error: any) {

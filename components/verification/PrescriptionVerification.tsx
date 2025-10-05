@@ -160,7 +160,7 @@ export default function PrescriptionVerification() {
         },
         body: JSON.stringify({
           phone: verificationResult.prescriptionData.patientId, // In real app, get from prescription data
-          email: verificationResult.prescriptionData.patientEmail || 'patient@example.com', // Use patient email from prescription
+          email: (verificationResult.prescriptionData as any).patientEmail || 'patient@example.com', // Use patient email from prescription
           prescriptionId: verificationResult.prescriptionData.prescriptionId
         }),
       })

@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import AuthForm from '@/components/auth/AuthForm'
+import { User } from '@supabase/supabase-js'
 
 export default function TestSupabase() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
