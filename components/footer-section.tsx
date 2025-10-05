@@ -132,7 +132,7 @@ export default function FooterSection() {
           <div className="w-full h-full relative">
             {Array.from({ length: 400 }).map((_, i) => (
               <div
-                key={i}
+                key={`footer-pattern-${i}`}
                 className="absolute w-[300px] h-16 border border-[rgba(3,7,18,0.08)]"
                 style={{
                   left: `${i * 300 - 600}px`,
