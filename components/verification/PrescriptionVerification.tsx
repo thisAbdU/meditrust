@@ -1,440 +1,546 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { QrCodeIcon, MagnifyingGlassIcon, CheckCircleIcon, XCircleIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react'
 
-interface VerificationResult {
-  isValid: boolean
+interface PrescriptionData {
   prescriptionId: string
   patientName: string
+  patientId: string
   medicationName: string
   dosage: string
+  duration: string
+  instructions: string
   doctorName: string
-  issueDate: string
-  status: string
+  timestamp: string
+}
+
+interface VerificationResult {
+  success: boolean
+  verified: boolean
+  message: string
+  prescriptionData?: PrescriptionData
   error?: string
 }
 
 export default function PrescriptionVerification() {
-  const [verificationMode, setVerificationMode] = useState<'qr' | 'manual' | 'upload'>('qr')
-  const [manualId, setManualId] = useState('')
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [result, setResult] = useState<VerificationResult | null>(null)
-  const [error, setError] = useState('')
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
-  const [isProcessingImage, setIsProcessingImage] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [qrCodeInput, setQrCodeInput] = useState('')
+  const [prescriptionId, setPrescriptionId] = useState('')
+  const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpId, setOtpId] = useState('')
+  const [otpCode, setOtpCode] = useState('')
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [mockOtpCode, setMockOtpCode] = useState('')
+  const [dispensed, setDispensed] = useState(false)
+  const [dispenseLoading, setDispenseLoading] = useState(false)
+  const [dispenseResult, setDispenseResult] = useState<any>(null)
 
-  // Mock QR scanner simulation
-  const [isScanning, setIsScanning] = useState(false)
-
-  const handleQRScan = () => {
-    setIsScanning(true)
-    setError('')
-    setResult(null)
-    
-    // Simulate QR scanning process
-    setTimeout(() => {
-      setIsScanning(false)
-      // Mock QR code data - in real app, this would come from camera
-      const mockQRData = 'https://meditrust.verify/rx/RX1703123456ABC'
-      verifyPrescription(mockQRData)
-    }, 2000)
-  }
-
-  const handleManualVerification = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!manualId.trim()) {
-      setError('Please enter a prescription ID')
+  const handleQRCodeScan = async () => {
+    if (!qrCodeInput.trim()) {
+      alert('Please enter a QR code or prescription ID')
       return
     }
-    
-    setError('')
-    setResult(null)
-    await verifyPrescription(manualId.trim())
-  }
 
-  const verifyPrescription = async (prescriptionId: string) => {
-    setIsVerifying(true)
-    setError('')
-    setResult(null)
+    setLoading(true)
+    setVerificationResult(null)
 
     try {
-      // Simulate blockchain verification (3 seconds max as per requirements)
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 1000)) // 1-3 seconds
-      
-      // Mock verification logic
-      const mockPrescriptions = JSON.parse(localStorage.getItem('prescriptions') || '[]')
-      const prescription = mockPrescriptions.find((p: any) => 
-        p.id === prescriptionId || p.qrCode === prescriptionId
-      )
+      // Parse QR code data (assuming it contains JSON with transaction hash and prescription ID)
+      let qrData
+      let transactionHash
+      let prescriptionIdFromQR
 
-      if (prescription) {
-        // Valid prescription found
-        setResult({
-          isValid: true,
-          prescriptionId: prescription.id,
-          patientName: prescription.patientName,
-          medicationName: prescription.medicationName,
-          dosage: prescription.dosage,
-          doctorName: 'Dr. John Smith', // Mock doctor name
-          issueDate: new Date(prescription.timestamp).toLocaleDateString(),
-          status: 'verified'
-        })
-
-        // Store verification in history
-        const verificationHistory = JSON.parse(localStorage.getItem('verificationHistory') || '[]')
-        verificationHistory.unshift({
-          id: Date.now().toString(),
-          prescriptionId: prescription.id,
-          patientName: prescription.patientName,
-          medicationName: prescription.medicationName,
-          verifiedAt: new Date().toISOString(),
-          isValid: true
-        })
-        localStorage.setItem('verificationHistory', JSON.stringify(verificationHistory.slice(0, 50))) // Keep last 50
-
-      } else {
-        // Invalid prescription
-        setResult({
-          isValid: false,
-          prescriptionId: prescriptionId,
-          patientName: '',
-          medicationName: '',
-          dosage: '',
-          doctorName: '',
-          issueDate: '',
-          status: 'not_found',
-          error: 'Prescription not found in blockchain records'
-        })
-
-        // Store failed verification
-        const verificationHistory = JSON.parse(localStorage.getItem('verificationHistory') || '[]')
-        verificationHistory.unshift({
-          id: Date.now().toString(),
-          prescriptionId: prescriptionId,
-          patientName: '',
-          medicationName: '',
-          verifiedAt: new Date().toISOString(),
-          isValid: false,
-          error: 'Prescription not found'
-        })
-        localStorage.setItem('verificationHistory', JSON.stringify(verificationHistory.slice(0, 50)))
+      try {
+        qrData = JSON.parse(qrCodeInput)
+        transactionHash = qrData.transactionHash
+        prescriptionIdFromQR = qrData.prescriptionId
+      } catch {
+        // If not JSON, treat as prescription ID
+        prescriptionIdFromQR = qrCodeInput
       }
 
-    } catch (error) {
-      setError('Verification failed. Please try again.')
+      console.log('🔍 Verifying prescription...')
+      console.log('Transaction Hash:', transactionHash)
+      console.log('Prescription ID:', prescriptionIdFromQR)
+
+      const response = await fetch('/api/hedera/verify-prescription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prescriptionId: prescriptionIdFromQR,
+          transactionHash: transactionHash
+        }),
+      })
+
+      const result = await response.json()
+      setVerificationResult(result)
+
+      if (result.success && result.verified) {
+        setPrescriptionId(prescriptionIdFromQR)
+        console.log('✅ Prescription verified successfully')
+      } else {
+        console.log('❌ Prescription verification failed:', result.message)
+      }
+    } catch (error: any) {
+      console.error('❌ Verification failed:', error)
+      setVerificationResult({
+        success: false,
+        verified: false,
+        message: 'Failed to verify prescription',
+        error: error.message
+      })
     } finally {
-      setIsVerifying(false)
+      setLoading(false)
     }
   }
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file')
+  const handleManualEntry = async () => {
+    if (!prescriptionId.trim()) {
+      alert('Please enter a prescription ID')
       return
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image file must be less than 5MB')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const imageData = e.target?.result as string
-      setUploadedImage(imageData)
-      setError('')
-      setResult(null)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const processUploadedImage = async () => {
-    if (!uploadedImage) return
-
-    setIsProcessingImage(true)
-    setError('')
-    setResult(null)
+    setLoading(true)
+    setVerificationResult(null)
 
     try {
-      // Simulate image processing and QR code extraction
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Mock QR code extraction from image
-      // In a real app, this would use a QR code library to extract the code from the image
-      const mockExtractedQR = 'https://meditrust.verify/rx/RX1703123456ABC'
-      
-      await verifyPrescription(mockExtractedQR)
-    } catch (error) {
-      setError('Failed to process image. Please try again.')
+      console.log('🔍 Verifying prescription manually...')
+      console.log('Prescription ID:', prescriptionId)
+
+      const response = await fetch('/api/hedera/verify-prescription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prescriptionId: prescriptionId
+        }),
+      })
+
+      const result = await response.json()
+      setVerificationResult(result)
+
+      if (result.success && result.verified) {
+        console.log('✅ Prescription verified successfully')
+      } else {
+        console.log('❌ Prescription verification failed:', result.message)
+      }
+    } catch (error: any) {
+      console.error('❌ Verification failed:', error)
+      setVerificationResult({
+        success: false,
+        verified: false,
+        message: 'Failed to verify prescription',
+        error: error.message
+      })
     } finally {
-      setIsProcessingImage(false)
+      setLoading(false)
     }
   }
 
-  const resetVerification = () => {
-    setResult(null)
-    setError('')
-    setManualId('')
-    setUploadedImage(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+  const sendOTP = async () => {
+    if (!verificationResult?.prescriptionData) {
+      alert('No verified prescription found')
+      return
+    }
+
+    setOtpLoading(true)
+
+    try {
+      console.log('📱 Sending OTP to patient...')
+      
+      const response = await fetch('/api/otp/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: verificationResult.prescriptionData.patientId, // In real app, get from prescription data
+          email: verificationResult.prescriptionData.patientEmail || 'patient@example.com', // Use patient email from prescription
+          prescriptionId: verificationResult.prescriptionData.prescriptionId
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setOtpId(result.otpId)
+        setOtpSent(true)
+        console.log('✅ OTP sent successfully')
+        
+        // For development: extract OTP from console logs
+        // In real app, patient would receive this via SMS
+        console.log('🔑 [DEV] Mock OTP Code will be shown in UI for testing')
+      } else {
+        alert(`Failed to send OTP: ${result.error}`)
+      }
+    } catch (error: any) {
+      console.error('❌ Failed to send OTP:', error)
+      alert(`Failed to send OTP: ${error.message}`)
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const verifyOTP = async () => {
+    if (!otpId || !otpCode.trim()) {
+      alert('Please enter the OTP code')
+      return
+    }
+
+    setOtpLoading(true)
+
+    try {
+      console.log('🔐 Verifying OTP...')
+      
+      const response = await fetch('/api/otp/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          otpId: otpId,
+          otp: otpCode
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setOtpVerified(true)
+        console.log('✅ OTP verified successfully')
+        alert('✅ Patient identity confirmed! Prescription is ready for dispensing.')
+      } else {
+        alert(`❌ OTP verification failed: ${result.message}`)
+      }
+    } catch (error: any) {
+      console.error('❌ Failed to verify OTP:', error)
+      alert(`Failed to verify OTP: ${error.message}`)
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const dispensePrescription = async () => {
+    if (!verificationResult?.prescriptionData) {
+      alert('No verified prescription found')
+      return
+    }
+
+    setDispenseLoading(true)
+
+    try {
+      console.log('💊 Dispensing prescription...')
+      
+      const pharmacyData = {
+        pharmacyId: 'PH001', // In real app, get from auth context
+        pharmacyName: 'MediTrust Pharmacy',
+        pharmacistId: 'PHARM001', // In real app, get from auth context
+        pharmacistName: 'Dr. Pharmacist',
+        dispensedAt: new Date().toISOString()
+      }
+      
+      const response = await fetch('/api/hedera/dispense-prescription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prescriptionId: verificationResult.prescriptionData.prescriptionId,
+          pharmacyData
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setDispensed(true)
+        setDispenseResult(result)
+        console.log('✅ Prescription dispensed successfully')
+        alert('✅ Prescription successfully dispensed and recorded on blockchain!')
+      } else {
+        alert(`Failed to dispense prescription: ${result.error}`)
+      }
+    } catch (error: any) {
+      console.error('❌ Failed to dispense prescription:', error)
+      alert(`Failed to dispense prescription: ${error.message}`)
+    } finally {
+      setDispenseLoading(false)
     }
   }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-[0px_0px_0px_0.75px_#E0DEDB_inset] border border-[#E0DEDB] overflow-hidden">
-        {/* Header */}
-        <div className="bg-[#F7F5F3] px-6 py-4 border-b border-[#E0DEDB]">
-          <h2 className="text-xl font-bold text-[#37322F]">Prescription Verification</h2>
-          <p className="text-[#605A57] text-sm mt-1">Scan QR code, upload image, or enter prescription ID to verify authenticity</p>
-        </div>
-
-        <div className="p-6">
-          {/* Mode Selection */}
-          <div className="flex space-x-1 bg-[#F7F5F3] p-1 rounded-lg mb-6">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">🔍 Prescription Verification</h1>
+        
+        {/* QR Code Scanner Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">📱 QR Code Scanner</h2>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Scan QR code or enter prescription ID"
+              value={qrCodeInput}
+              onChange={(e) => setQrCodeInput(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
             <button
-              onClick={() => {
-                setVerificationMode('qr')
-                resetVerification()
-              }}
-              className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                verificationMode === 'qr'
-                  ? 'bg-white text-[#37322F] shadow-sm'
-                  : 'text-[#605A57] hover:text-[#37322F]'
-              }`}
+              onClick={handleQRCodeScan}
+              disabled={loading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <QrCodeIcon className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">QR Scan</span>
-            </button>
-            <button
-              onClick={() => {
-                setVerificationMode('upload')
-                resetVerification()
-              }}
-              className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                verificationMode === 'upload'
-                  ? 'bg-white text-[#37322F] shadow-sm'
-                  : 'text-[#605A57] hover:text-[#37322F]'
-              }`}
-            >
-              <PhotoIcon className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Upload Image</span>
-            </button>
-            <button
-              onClick={() => {
-                setVerificationMode('manual')
-                resetVerification()
-              }}
-              className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                verificationMode === 'manual'
-                  ? 'bg-white text-[#37322F] shadow-sm'
-                  : 'text-[#605A57] hover:text-[#37322F]'
-              }`}
-            >
-              <MagnifyingGlassIcon className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Manual Entry</span>
+              {loading ? 'Verifying...' : 'Verify'}
             </button>
           </div>
-
-          {/* QR Code Scanner */}
-          {verificationMode === 'qr' && (
-            <div className="text-center">
-              <div className="mb-6">
-                <div className="w-64 h-64 mx-auto bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4">
-                  {isScanning ? (
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#37322F] mx-auto mb-2"></div>
-                      <p className="text-sm text-[#605A57]">Scanning QR Code...</p>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <QrCodeIcon className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-[#605A57]">QR Code Scanner</p>
-                      <p className="text-xs text-[#605A57] mt-1">Click to start scanning</p>
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleQRScan}
-                  disabled={isScanning || isVerifying}
-                  className="px-6 py-2 bg-[#37322F] text-white rounded-md hover:bg-[#2a2522] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isScanning ? 'Scanning...' : 'Start QR Scan'}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Image Upload */}
-          {verificationMode === 'upload' && (
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="imageUpload" className="block text-sm font-medium text-[#37322F] mb-2">
-                  Upload QR Code Image
-                </label>
-                <div className="border-2 border-dashed border-[#E0DEDB] rounded-lg p-6 text-center hover:border-[#37322F] transition-colors">
-                  {uploadedImage ? (
-                    <div className="space-y-4">
-                      <img 
-                        src={uploadedImage} 
-                        alt="Uploaded QR Code" 
-                        className="max-w-full max-h-64 mx-auto rounded-lg border border-[#E0DEDB]"
-                      />
-                      <p className="text-sm text-[#605A57]">Image uploaded successfully</p>
-                      <div className="flex space-x-2 justify-center">
-                        <button
-                          onClick={processUploadedImage}
-                          disabled={isProcessingImage}
-                          className="px-4 py-2 bg-[#37322F] text-white rounded-md hover:bg-[#2a2522] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isProcessingImage ? 'Processing...' : 'Extract & Verify QR Code'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setUploadedImage(null)
-                            if (fileInputRef.current) fileInputRef.current.value = ''
-                          }}
-                          className="px-4 py-2 border border-[#E0DEDB] text-[#37322F] rounded-md hover:bg-[#F7F5F3]"
-                        >
-                          Remove Image
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <PhotoIcon className="w-12 h-12 text-[#605A57] mx-auto mb-4" />
-                      <p className="text-sm text-[#37322F] font-medium mb-2">Upload QR Code Image</p>
-                      <p className="text-xs text-[#605A57] mb-4">PNG, JPG, or JPEG up to 5MB</p>
-                      <input
-                        ref={fileInputRef}
-                        id="imageUpload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="px-4 py-2 bg-[#37322F] text-white rounded-md hover:bg-[#2a2522]"
-                      >
-                        Choose Image
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Manual Entry */}
-          {verificationMode === 'manual' && (
-            <form onSubmit={handleManualVerification} className="space-y-4">
-              <div>
-                <label htmlFor="prescriptionId" className="block text-sm font-medium text-[#37322F] mb-2">
-                  Prescription ID
-                </label>
-                <input
-                  id="prescriptionId"
-                  type="text"
-                  value={manualId}
-                  onChange={(e) => setManualId(e.target.value)}
-                  placeholder="Enter prescription ID (e.g., RX1703123456ABC)"
-                  className="w-full px-3 py-2 border border-[#E0DEDB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#37322F] focus:border-[#37322F]"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isVerifying || !manualId.trim()}
-                className="w-full px-6 py-2 bg-[#37322F] text-white rounded-md hover:bg-[#2a2522] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isVerifying ? 'Verifying...' : 'Verify Prescription'}
-              </button>
-            </form>
-          )}
-
-          {/* Error Display */}
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
-          {/* Verification Result */}
-          {result && (
-            <div className="mt-6">
-              {result.isValid ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-                  <div className="flex items-center mb-4">
-                    <CheckCircleIcon className="w-8 h-8 text-green-600 mr-3" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-green-800">✅ Verified</h3>
-                      <p className="text-sm text-green-600">Prescription is authentic and valid</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-green-700 font-medium">Prescription ID</p>
-                      <p className="text-sm text-green-600 font-mono">{result.prescriptionId}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-green-700 font-medium">Patient Name</p>
-                      <p className="text-sm text-green-600">{result.patientName}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-green-700 font-medium">Medication</p>
-                      <p className="text-sm text-green-600">{result.medicationName}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-green-700 font-medium">Dosage</p>
-                      <p className="text-sm text-green-600">{result.dosage}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-green-700 font-medium">Doctor</p>
-                      <p className="text-sm text-green-600">{result.doctorName}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-green-700 font-medium">Issue Date</p>
-                      <p className="text-sm text-green-600">{result.issueDate}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                  <div className="flex items-center mb-4">
-                    <XCircleIcon className="w-8 h-8 text-red-600 mr-3" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-red-800">❌ Not Verified</h3>
-                      <p className="text-sm text-red-600">{result.error}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white border border-red-200 rounded-md p-4">
-                    <p className="text-sm text-red-700 font-medium mb-2">Prescription ID</p>
-                    <p className="text-sm text-red-600 font-mono">{result.prescriptionId}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={resetVerification}
-                  className="px-4 py-2 border border-[#E0DEDB] text-[#37322F] rounded-md hover:bg-[#F7F5F3] transition-colors"
-                >
-                  Verify Another
-                </button>
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Manual Entry Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">⌨️ Manual Entry</h2>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Enter prescription ID"
+              value={prescriptionId}
+              onChange={(e) => setPrescriptionId(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleManualEntry}
+              disabled={loading}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Verifying...' : 'Verify Manually'}
+            </button>
+          </div>
+        </div>
+
+        {/* Verification Result */}
+        {verificationResult && (
+          <div className={`mb-8 p-6 rounded-lg border-2 ${
+            verificationResult.verified 
+              ? 'bg-green-50 border-green-200' 
+              : 'bg-red-50 border-red-200'
+          }`}>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">
+                {verificationResult.verified ? '✅' : '❌'}
+              </span>
+              <h3 className="text-xl font-semibold">
+                {verificationResult.verified ? 'Verified' : 'Not Verified'}
+              </h3>
+            </div>
+            
+            <p className="text-gray-700 mb-4">{verificationResult.message}</p>
+            
+            {verificationResult.verified && verificationResult.prescriptionData && (
+              <div className="bg-white p-4 rounded-lg border">
+                <h4 className="font-semibold text-gray-800 mb-3">📋 Prescription Details</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-600">Patient:</span>
+                    <span className="ml-2 text-gray-800">{verificationResult.prescriptionData.patientName}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">ID:</span>
+                    <span className="ml-2 text-gray-800">{verificationResult.prescriptionData.patientId}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Medication:</span>
+                    <span className="ml-2 text-gray-800">{verificationResult.prescriptionData.medicationName}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Dosage:</span>
+                    <span className="ml-2 text-gray-800">{verificationResult.prescriptionData.dosage}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Duration:</span>
+                    <span className="ml-2 text-gray-800">{verificationResult.prescriptionData.duration}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Doctor:</span>
+                    <span className="ml-2 text-gray-800">{verificationResult.prescriptionData.doctorName}</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="font-medium text-gray-600">Instructions:</span>
+                  <p className="text-gray-800 mt-1">{verificationResult.prescriptionData.instructions}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* OTP Verification Section */}
+        {verificationResult?.verified && !otpVerified && (
+          <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">🔐 Patient Identity Verification</h3>
+            
+            {!otpSent ? (
+              <div>
+                <p className="text-blue-700 mb-4">
+                  To ensure the prescription belongs to the correct patient, we'll send a verification code to their registered email address.
+                </p>
+                <button
+                  onClick={sendOTP}
+                  disabled={otpLoading}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {otpLoading ? 'Sending...' : 'Send OTP to Patient Email'}
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-blue-700 mb-4">
+                  A 6-digit verification code has been sent to the patient's email. Please ask the patient to check their email and provide the code.
+                </p>
+                <div className="flex gap-4">
+                  <input
+                    type="text"
+                    placeholder="Enter 6-digit OTP"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    maxLength={6}
+                  />
+                  <button
+                    onClick={verifyOTP}
+                    disabled={otpLoading || otpCode.length !== 6}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {otpLoading ? 'Verifying...' : 'Verify OTP'}
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  OTP expires in 5 minutes. Maximum 3 attempts allowed.
+                </p>
+                
+                {/* Development Helper - Show OTP in Console */}
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800 font-medium">🔧 Development Mode</p>
+                  <p className="text-xs text-yellow-700 mt-1">
+                    Check the server console for the OTP code. In production, this would be sent via email.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Final Verification Status */}
+        {otpVerified && !dispensed && (
+          <div className="p-6 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">✅</span>
+              <h3 className="text-2xl font-semibold text-green-800">Identity Confirmed</h3>
+            </div>
+            <p className="text-green-700 mb-4">
+              Patient identity has been verified. The prescription is authentic and ready for dispensing.
+            </p>
+            <div className="bg-white p-4 rounded-lg border mb-4">
+              <h4 className="font-semibold text-gray-800 mb-2">✅ Verification Complete</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Prescription verified on blockchain</li>
+                <li>• Patient identity confirmed via OTP</li>
+                <li>• Ready for medication dispensing</li>
+              </ul>
+            </div>
+            
+            {/* Dispense Button */}
+            <div className="text-center">
+              <button
+                onClick={dispensePrescription}
+                disabled={dispenseLoading}
+                className="px-8 py-3 bg-green-600 text-white text-lg font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              >
+                {dispenseLoading ? 'Dispensing...' : '💊 Dispense Medication'}
+              </button>
+              <p className="text-sm text-gray-600 mt-2">
+                This will mark the prescription as dispensed on the blockchain
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Dispensed Status */}
+        {dispensed && dispenseResult && (
+          <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">💊</span>
+              <h3 className="text-2xl font-semibold text-blue-800">Medication Dispensed</h3>
+            </div>
+            <p className="text-blue-700 mb-4">
+              The prescription has been successfully dispensed and recorded on the blockchain.
+            </p>
+            
+            <div className="bg-white p-4 rounded-lg border mb-4">
+              <h4 className="font-semibold text-gray-800 mb-3">📋 Dispensing Details</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-gray-600">Pharmacy:</span>
+                  <span className="ml-2 text-gray-800">{dispenseResult.pharmacyData?.pharmacyName}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Pharmacist:</span>
+                  <span className="ml-2 text-gray-800">{dispenseResult.pharmacyData?.pharmacistName}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Dispensed At:</span>
+                  <span className="ml-2 text-gray-800">{new Date(dispenseResult.pharmacyData?.dispensedAt).toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600">Status:</span>
+                  <span className="ml-2 text-green-600 font-semibold">✅ Dispensed</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Blockchain Information */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-800 mb-2">🔗 Blockchain Record</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-blue-600">Transaction ID:</span>
+                  <span className="text-xs font-mono text-blue-800 break-all">{dispenseResult.transactionHash}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-blue-600">Network:</span>
+                  <span className="text-sm text-blue-800">{dispenseResult.network}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-blue-600">Status:</span>
+                  <span className="text-sm text-green-600 font-semibold">✅ Recorded on Blockchain</span>
+                </div>
+              </div>
+              
+              {/* Explorer Links */}
+              <div className="mt-4 pt-3 border-t border-blue-200">
+                <p className="text-sm text-blue-600 mb-2">Verify on Blockchain Explorer:</p>
+                <div className="flex gap-2">
+                  <a
+                    href={`https://hashscan.io/testnet/transaction/${dispenseResult.transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                  >
+                    🔍 View on Hashscan
+                  </a>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(dispenseResult.transactionHash)}
+                    className="inline-flex items-center px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors"
+                  >
+                    📋 Copy ID
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
