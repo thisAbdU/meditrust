@@ -47,6 +47,10 @@ export default function IssuePrescriptionForm() {
   const [qrCode, setQrCode] = useState('')
   const [transactionHash, setTransactionHash] = useState('')
   const [blockchainStatus, setBlockchainStatus] = useState('')
+  const [notificationResults, setNotificationResults] = useState<{
+    sms: { success: boolean; message: string; error?: string }
+    email: { success: boolean; message: string; error?: string }
+  } | null>(null)
   const [prescriptionUtils] = useState(() => new PrescriptionUtils())
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -161,6 +165,11 @@ export default function IssuePrescriptionForm() {
       }
 
       setTransactionHash(blockchainResult.transactionHash)
+      
+      // Store notification results if available
+      if (blockchainResult.notifications) {
+        setNotificationResults(blockchainResult.notifications)
+      }
       setBlockchainStatus('Generating QR code...')
 
       // Generate QR code with blockchain transaction hash
