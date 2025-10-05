@@ -2,6 +2,7 @@
 export { createHederaClient, getDefaultClient, createAccountClient, HEDERA_NETWORKS } from './client'
 export { HederaAccount } from './account'
 export { PrescriptionContract, PrescriptionVerification } from './contracts'
+export { PrescriptionUtils, type PrescriptionData, type BlockchainPrescriptionRecord, type QRCodeData } from './prescription-utils'
 
 // Network types
 export type { HederaNetwork } from './client'

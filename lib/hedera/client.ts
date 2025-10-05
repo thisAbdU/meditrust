@@ -13,12 +13,26 @@ export type HederaNetwork = keyof typeof HEDERA_NETWORKS
 export function createHederaClient(network: HederaNetwork = 'testnet') {
   const client = Client.forNetwork(network)
   
+  // Debug environment variables
+  console.log('🔍 Checking Hedera environment variables:')
+  console.log('HEDERA_OPERATOR_ID:', process.env.HEDERA_OPERATOR_ID ? 'Set' : 'Not set')
+  console.log('HEDERA_OPERATOR_KEY:', process.env.HEDERA_OPERATOR_KEY ? 'Set' : 'Not set')
+  console.log('HEDERA_NETWORK:', process.env.HEDERA_NETWORK || 'testnet')
+  
   // Set operator if credentials are provided
   if (process.env.HEDERA_OPERATOR_ID && process.env.HEDERA_OPERATOR_KEY) {
-    const operatorId = AccountId.fromString(process.env.HEDERA_OPERATOR_ID)
-    const operatorKey = PrivateKey.fromString(process.env.HEDERA_OPERATOR_KEY)
-    
-    client.setOperator(operatorId, operatorKey)
+    try {
+      const operatorId = AccountId.fromString(process.env.HEDERA_OPERATOR_ID)
+      const operatorKey = PrivateKey.fromString(process.env.HEDERA_OPERATOR_KEY)
+      
+      client.setOperator(operatorId, operatorKey)
+      console.log('✅ Hedera operator set successfully')
+    } catch (error) {
+      console.error('❌ Failed to set Hedera operator:', error)
+      throw new Error(`Failed to set Hedera operator: ${error}`)
+    }
+  } else {
+    console.warn('⚠️ Hedera operator credentials not found in environment variables')
   }
   
   return client

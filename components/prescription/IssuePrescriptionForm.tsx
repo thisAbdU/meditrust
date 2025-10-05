@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { PrescriptionUtils, type PrescriptionData as HederaPrescriptionData } from '@/lib/hedera'
 
 interface PrescriptionData {
   patientName: string
   patientId: string
+  patientEmail: string
+  patientPhone: string
   medicationName: string
   dosage: string
   duration: string
@@ -16,6 +19,8 @@ interface PrescriptionData {
 interface FormErrors {
   patientName?: string
   patientId?: string
+  patientEmail?: string
+  patientPhone?: string
   medicationName?: string
   dosage?: string
   duration?: string
@@ -27,6 +32,8 @@ export default function IssuePrescriptionForm() {
   const [formData, setFormData] = useState<PrescriptionData>({
     patientName: '',
     patientId: '',
+    patientEmail: '',
+    patientPhone: '',
     medicationName: '',
     dosage: '',
     duration: '',
@@ -38,6 +45,9 @@ export default function IssuePrescriptionForm() {
   const [success, setSuccess] = useState(false)
   const [prescriptionId, setPrescriptionId] = useState('')
   const [qrCode, setQrCode] = useState('')
+  const [transactionHash, setTransactionHash] = useState('')
+  const [blockchainStatus, setBlockchainStatus] = useState('')
+  const [prescriptionUtils] = useState(() => new PrescriptionUtils())
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -58,6 +68,16 @@ export default function IssuePrescriptionForm() {
 
     if (!formData.patientId.trim()) {
       newErrors.patientId = 'Patient ID is required'
+    }
+
+    if (!formData.patientEmail.trim()) {
+      newErrors.patientEmail = 'Patient email is required'
+    } else if (!/\S+@\S+\.\S+/.test(formData.patientEmail)) {
+      newErrors.patientEmail = 'Please enter a valid email address'
+    }
+
+    if (!formData.patientPhone.trim()) {
+      newErrors.patientPhone = 'Patient phone is required'
     }
 
     if (!formData.medicationName.trim()) {
@@ -91,6 +111,7 @@ export default function IssuePrescriptionForm() {
     e.preventDefault()
     setLoading(true)
     setErrors({})
+    setBlockchainStatus('Validating prescription data...')
 
     if (!validateForm()) {
       setLoading(false)
@@ -99,21 +120,75 @@ export default function IssuePrescriptionForm() {
 
     try {
       // Generate prescription ID
-      const newPrescriptionId = generatePrescriptionId()
+      const newPrescriptionId = prescriptionUtils.generatePrescriptionId()
       setPrescriptionId(newPrescriptionId)
+      setBlockchainStatus('Generating prescription ID...')
 
-      // Generate QR code
-      const qrCodeUrl = generateQRCode(newPrescriptionId)
+      // Prepare prescription data for blockchain
+      const prescriptionData: HederaPrescriptionData = {
+        prescriptionId: newPrescriptionId,
+        patientId: formData.patientId,
+        doctorId: '0.0.6945975', // Mock doctor ID - in real app, get from auth
+        patientName: formData.patientName,
+        patientEmail: formData.patientEmail,
+        patientPhone: formData.patientPhone,
+        medicationName: formData.medicationName,
+        dosage: formData.dosage,
+        duration: formData.duration,
+        instructions: formData.instructions,
+        doctorNotes: formData.doctorNotes
+      }
+
+      // Record prescription on Hedera blockchain via API
+      setBlockchainStatus('Recording prescription on Hedera blockchain...')
+      const blockchainResponse = await fetch('/api/hedera/record-prescription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(prescriptionData),
+      })
+
+      if (!blockchainResponse.ok) {
+        const errorData = await blockchainResponse.json()
+        throw new Error(errorData.error || 'Failed to record prescription on blockchain')
+      }
+
+      const blockchainResult = await blockchainResponse.json()
+      
+      if (!blockchainResult.success) {
+        throw new Error(blockchainResult.message)
+      }
+
+      setTransactionHash(blockchainResult.transactionHash)
+      setBlockchainStatus('Generating QR code...')
+
+      // Generate QR code with blockchain transaction hash
+      const qrCodeUrl = await prescriptionUtils.generateQRCode(
+        blockchainResult.transactionHash,
+        newPrescriptionId
+      )
       setQrCode(qrCodeUrl)
 
-      // Mock blockchain recording (in real app, this would call Hedera API)
-      await new Promise(resolve => setTimeout(resolve, 3000)) // Simulate 3-second blockchain recording
+      // Send prescription to patient
+      setBlockchainStatus('Sending prescription to patient...')
+      const sendResult = await prescriptionUtils.sendPrescriptionToPatient(
+        prescriptionData,
+        qrCodeUrl,
+        blockchainResult.transactionHash
+      )
 
-      // Mock successful prescription creation
+      if (!sendResult.success) {
+        console.warn('Failed to send prescription to patient:', sendResult.message)
+      }
+
+      // Store prescription in local database
       const prescription = {
         id: newPrescriptionId,
         patientName: formData.patientName,
         patientId: formData.patientId,
+        patientEmail: formData.patientEmail,
+        patientPhone: formData.patientPhone,
         medicationName: formData.medicationName,
         dosage: formData.dosage,
         duration: formData.duration,
@@ -121,7 +196,9 @@ export default function IssuePrescriptionForm() {
         doctorNotes: formData.doctorNotes,
         timestamp: new Date().toISOString(),
         qrCode: qrCodeUrl,
-        status: 'issued'
+        transactionHash: blockchainResult.transactionHash,
+        status: 'issued',
+        network: blockchainResult.network
       }
 
       // Store in localStorage (in real app, this would be stored in database)
@@ -129,10 +206,12 @@ export default function IssuePrescriptionForm() {
       existingPrescriptions.push(prescription)
       localStorage.setItem('prescriptions', JSON.stringify(existingPrescriptions))
 
+      setBlockchainStatus('Prescription successfully recorded on blockchain!')
       setSuccess(true)
 
-    } catch (error) {
-      setErrors({ general: 'Failed to issue prescription. Please try again.' })
+    } catch (error: any) {
+      setErrors({ general: `Failed to issue prescription: ${error.message}` })
+      setBlockchainStatus('Failed to record prescription on blockchain')
     } finally {
       setLoading(false)
     }
@@ -173,21 +252,67 @@ export default function IssuePrescriptionForm() {
             </div>
           </div>
 
+          {/* Blockchain Information */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="text-lg font-semibold text-blue-800 mb-2">🔗 Blockchain Record</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-blue-600">Transaction ID:</span>
+                <span className="text-xs font-mono text-blue-800 break-all">{transactionHash}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-blue-600">Network:</span>
+                <span className="text-sm text-blue-800">Hedera Testnet</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-blue-600">Status:</span>
+                <span className="text-sm text-green-600 font-semibold">✅ Recorded on Blockchain</span>
+              </div>
+            </div>
+            
+            {/* Explorer Links */}
+            <div className="mt-4 pt-3 border-t border-blue-200">
+              <p className="text-sm text-blue-600 mb-2">Verify on Blockchain Explorer:</p>
+              <div className="flex gap-2">
+                <a
+                  href={`https://hashscan.io/testnet/transaction/${transactionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                >
+                  🔍 View on Hashscan
+                </a>
+                <button
+                  onClick={() => navigator.clipboard.writeText(transactionHash)}
+                  className="inline-flex items-center px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors"
+                >
+                  📋 Copy ID
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* QR Code */}
           <div className="bg-white border border-[#E0DEDB] rounded-lg p-4 mb-6">
             <h3 className="text-lg font-semibold text-[#37322F] mb-2">QR Code for Verification</h3>
             <div className="flex justify-center mb-4">
-              <div className="w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">📱</div>
-                  <div className="text-xs text-gray-500">QR Code</div>
+              {qrCode ? (
+                <img 
+                  src={qrCode} 
+                  alt="Prescription QR Code" 
+                  className="w-48 h-48 border border-gray-300 rounded-lg"
+                />
+              ) : (
+                <div className="w-48 h-48 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">📱</div>
+                    <div className="text-xs text-gray-500">QR Code</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <p className="text-sm text-[#605A57] text-center">
-              Pharmacies can scan this QR code to verify the prescription
-            </p>
-            <p className="text-xs text-[#605A57] text-center mt-2 font-mono">
-              {qrCode}
+              Pharmacies can scan this QR code to verify the prescription on the blockchain
             </p>
           </div>
 
@@ -271,6 +396,46 @@ export default function IssuePrescriptionForm() {
                 placeholder="P123456789"
               />
               {errors.patientId && <p className="mt-1 text-sm text-red-600">{errors.patientId}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="patientEmail" className="block text-sm font-medium text-[#37322F]">
+                Patient Email *
+              </label>
+              <input
+                id="patientEmail"
+                name="patientEmail"
+                type="email"
+                value={formData.patientEmail}
+                onChange={handleInputChange}
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  errors.patientEmail 
+                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                    : 'border-[#E0DEDB] focus:ring-[#37322F] focus:border-[#37322F]'
+                }`}
+                placeholder="patient@example.com"
+              />
+              {errors.patientEmail && <p className="mt-1 text-sm text-red-600">{errors.patientEmail}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="patientPhone" className="block text-sm font-medium text-[#37322F]">
+                Patient Phone *
+              </label>
+              <input
+                id="patientPhone"
+                name="patientPhone"
+                type="tel"
+                value={formData.patientPhone}
+                onChange={handleInputChange}
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  errors.patientPhone 
+                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                    : 'border-[#E0DEDB] focus:ring-[#37322F] focus:border-[#37322F]'
+                }`}
+                placeholder="+1234567890"
+              />
+              {errors.patientPhone && <p className="mt-1 text-sm text-red-600">{errors.patientPhone}</p>}
             </div>
           </div>
         </div>
@@ -389,6 +554,23 @@ export default function IssuePrescriptionForm() {
         {errors.general && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
             <p className="text-sm text-red-600">{errors.general}</p>
+          </div>
+        )}
+
+        {/* Blockchain Status */}
+        {blockchainStatus && (
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-blue-600 font-medium">🔗 {blockchainStatus}</p>
+              </div>
+            </div>
           </div>
         )}
 
