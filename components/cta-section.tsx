@@ -9,7 +9,7 @@ export default function CTASection() {
           <div className="w-full h-full relative">
             {Array.from({ length: 300 }).map((_, i) => (
               <div
-                key={i}
+                key={`cta-pattern-${i}`}
                 className="absolute h-4 w-full rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                 style={{
                   top: `${i * 16 - 120}px`,
