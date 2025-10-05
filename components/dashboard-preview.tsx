@@ -51,7 +51,7 @@ export function DashboardPreview() {
 
                 {/* Table Rows */}
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={`table-row-${i}`} className="grid grid-cols-6 gap-4 p-4 border-b border-[#e0dedb] text-sm">
+                  <div key={i} className="grid grid-cols-6 gap-4 p-4 border-b border-[#e0dedb] text-sm">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 bg-[#37322f] rounded-full"></div>
                       <span>Patient {i + 1}</span>
