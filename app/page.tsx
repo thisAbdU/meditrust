@@ -100,28 +100,23 @@ export default function LandingPage() {
                       MediTrust
                     </div>
                   </div>
-                   <div className="pl-3 sm:pl-4 md:pl-5 lg:pl-5 flex justify-start items-start hidden sm:flex flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-4">
-                     <div className="flex justify-start items-center">
-                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
-                         Features
-                       </div>
-                     </div>
-                     <div className="flex justify-start items-center">
-                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
-                         About
-                       </div>
-                     </div>
-                     <div className="flex justify-start items-center">
-                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
-                         Pricing
-                       </div>
-                     </div>
-                     <div className="flex justify-start items-center">
-                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
-                         Docs
-                       </div>
-                     </div>
-                   </div>
+                  <div className="pl-3 sm:pl-4 md:pl-5 lg:pl-5 flex justify-start items-start hidden sm:flex flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-4">
+                    <div className="flex justify-start items-center">
+                      <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
+                        Features
+                      </div>
+                    </div>
+                    <div className="flex justify-start items-center">
+                      <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
+                        Pricing
+                      </div>
+                    </div>
+                    <div className="flex justify-start items-center">
+                      <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] text-xs md:text-[13px] font-medium leading-[14px] font-sans">
+                        Docs
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="h-6 sm:h-7 md:h-8 flex justify-start items-start gap-2 sm:gap-3">
                   <div className="relative group">
@@ -140,6 +135,16 @@ export default function LandingPage() {
                         <span className="text-xs">🏥</span>
                         <div className="flex flex-col justify-center text-[#37322F] text-xs md:text-[13px] font-medium leading-5 font-sans">
                           Pharmacy
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  <div className="relative group">
+                    <a href="/patient/dashboard" className="px-3 sm:px-4 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs">🧑</span>
+                        <div className="flex flex-col justify-center text-[#37322F] text-xs md:text-[13px] font-medium leading-5 font-sans">
+                          Patient
                         </div>
                       </div>
                     </a>
@@ -168,7 +173,7 @@ export default function LandingPage() {
               <div className="w-full max-w-[600px] lg:w-[600px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12">
                 <div className="w-full">
                   <p className="text-center text-[#605A57] text-sm mb-4">Choose your role to get started</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {/* Doctor Card */}
                     <a href="/doctor/signup" className="group relative bg-white border border-[#E0DEDB] rounded-xl p-6 hover:border-[#37322F] hover:shadow-lg transition-all duration-200 cursor-pointer">
                       <div className="flex flex-col items-center text-center space-y-3">
@@ -200,6 +205,22 @@ export default function LandingPage() {
                         </div>
                       </div>
                     </a>
+
+                    {/* Patient Card */}
+                    <a href="/patient/signin" className="group relative bg-white border border-[#E0DEDB] rounded-xl p-6 hover:border-[#37322F] hover:shadow-lg transition-all duration-200 cursor-pointer">
+                      <div className="flex flex-col items-center text-center space-y-3">
+                        <div className="w-12 h-12 bg-[#37322F] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                          <span className="text-white text-xl">🧑</span>
+                        </div>
+                        <div>
+                          <h3 className="text-[#37322F] font-semibold text-lg">Patient</h3>
+                          <p className="text-[#605A57] text-sm">View prescriptions & QR codes</p>
+                        </div>
+                        <div className="text-[#37322F] text-sm font-medium group-hover:text-[#2a2522]">
+                          Go to Dashboard →
+                        </div>
+                      </div>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -215,14 +236,64 @@ export default function LandingPage() {
                 />
               </div>
 
+              <div className="w-full max-w-[960px] lg:w-[960px] pt-2 sm:pt-4 pb-6 sm:pb-8 md:pb-10 px-2 sm:px-4 md:px-6 lg:px-11 flex flex-col justify-center items-center gap-2 relative z-5 my-8 sm:my-12 md:my-16 lg:my-16 mb-0 lg:pb-0">
+                <div className="w-full max-w-[960px] lg:w-[960px] h-[200px] sm:h-[280px] md:h-[450px] lg:h-[695.55px] bg-white shadow-[0px_0px_0px_0.9056603908538818px_rgba(0,0,0,0.08)] overflow-hidden rounded-[6px] sm:rounded-[8px] lg:rounded-[9.06px] flex flex-col justify-start items-start">
+                  {/* Dashboard Content */}
+                  <div className="self-stretch flex-1 flex justify-start items-start">
+                    {/* Main Content */}
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="relative w-full h-full overflow-hidden">
+                        {/* Product Image 1 - Plan your schedules */}
+                        <div
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                            activeCard === 0 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                          }`}
+                        >
+                          <img
+                            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dsadsadsa.jpg-xTHS4hGwCWp2H5bTj8np6DXZUyrxX7.jpeg"
+                            alt="Schedules Dashboard - Customer Subscription Management"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
 
-              <div className="self-stretch border-t border-[#E0DEDB] border-b border-[#E0DEDB] flex justify-center items-start mt-8 sm:mt-12 md:mt-16 lg:mt-20">
+                        {/* Product Image 2 - Data to insights */}
+                        <div
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                            activeCard === 1 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                          }`}
+                        >
+                          <img
+                            src="/analytics-dashboard-with-charts-graphs-and-data-vi.jpg"
+                            alt="Analytics Dashboard"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* Product Image 3 - Data visualization */}
+                        <div
+                          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                            activeCard === 2 ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"
+                          }`}
+                        >
+                          <img
+                            src="/data-visualization-dashboard-with-interactive-char.jpg"
+                            alt="Data Visualization Dashboard"
+                            className="w-full h-full object-contain" // Changed from object-cover to object-contain to preserve landscape aspect ratio
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="self-stretch border-t border-[#E0DEDB] border-b border-[#E0DEDB] flex justify-center items-start">
                 <div className="w-4 sm:w-6 md:w-8 lg:w-12 self-stretch relative overflow-hidden">
                   {/* Left decorative pattern */}
                   <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
                     {Array.from({ length: 50 }).map((_, i) => (
                       <div
-                        key={`pattern-${i}`}
+                        key={i}
                         className="self-stretch h-3 sm:h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                       ></div>
                     ))}
@@ -259,108 +330,10 @@ export default function LandingPage() {
                   <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
                     {Array.from({ length: 50 }).map((_, i) => (
                       <div
-                        key={`pattern-${i}`}
+                        key={i}
                         className="self-stretch h-3 sm:h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                       ></div>
                     ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Feature Highlights Section */}
-              <div className="w-full border-b border-[rgba(55,50,47,0.12)] flex flex-col justify-center items-center">
-                <div className="self-stretch px-4 sm:px-6 md:px-24 py-8 sm:py-12 md:py-16 border-b border-[rgba(55,50,47,0.12)] flex justify-center items-center gap-6">
-                  <div className="w-full max-w-[586px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4 shadow-none">
-                    <Badge
-                      icon={
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M6 1L7.5 4.5L11 4.5L8.5 7L9.5 10.5L6 8.5L2.5 10.5L3.5 7L1 4.5L4.5 4.5L6 1Z" stroke="#37322F" strokeWidth="1" fill="none"/>
-                        </svg>
-                      }
-                      text="Feature Highlights"
-                    />
-                    <div className="w-full max-w-[472.55px] text-center flex justify-center flex-col text-[#49423D] text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold leading-tight md:leading-[60px] font-sans tracking-tight">
-                      Core Features
-                    </div>
-                    <div className="self-stretch text-center text-[#605A57] text-sm sm:text-base font-normal leading-6 sm:leading-7 font-sans">
-                      Essential features that make prescription verification secure and reliable
-                    </div>
-                  </div>
-                </div>
-
-                {/* Feature Cards Grid */}
-                <div className="self-stretch px-4 sm:px-6 md:px-24 py-8 sm:py-12 md:py-16 flex justify-center items-center">
-                  <div className="w-full max-w-[1060px] grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                    {/* Secure Verification Card */}
-                    <div className="flex flex-col justify-start items-start gap-4 p-6 bg-white border border-[#E0DEDB] rounded-lg shadow-sm">
-                      <div className="w-12 h-12 bg-[#37322F] rounded-lg flex items-center justify-center">
-                        <span className="text-white text-2xl">🔒</span>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] text-lg font-semibold leading-tight font-sans">
-                          Secure Verification
-                        </h3>
-                        <p className="text-[#605A57] text-sm font-normal leading-relaxed font-sans">
-                          Every prescription is verified on the blockchain to ensure authenticity.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Fraud Detection Card */}
-                    <div className="flex flex-col justify-start items-start gap-4 p-6 bg-white border border-[#E0DEDB] rounded-lg shadow-sm">
-                      <div className="w-12 h-12 bg-[#37322F] rounded-lg flex items-center justify-center">
-                        <span className="text-white text-2xl">🧠</span>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] text-lg font-semibold leading-tight font-sans">
-                          Fraud Detection
-                        </h3>
-                        <p className="text-[#605A57] text-sm font-normal leading-relaxed font-sans">
-                          Detect and prevent tampered or fake prescriptions instantly.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Doctor-Pharmacy Trust Card */}
-                    <div className="flex flex-col justify-start items-start gap-4 p-6 bg-white border border-[#E0DEDB] rounded-lg shadow-sm">
-                      <div className="w-12 h-12 bg-[#37322F] rounded-lg flex items-center justify-center">
-                        <span className="text-white text-2xl">🤝</span>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h3 className="text-[#37322F] text-lg font-semibold leading-tight font-sans">
-                          Doctor–Pharmacy Trust
-                        </h3>
-                        <p className="text-[#605A57] text-sm font-normal leading-relaxed font-sans">
-                          Build transparency and collaboration between healthcare providers.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* About MediTrust Section */}
-              <div className="w-full border-b border-[rgba(55,50,47,0.12)] flex flex-col justify-center items-center">
-                <div className="self-stretch px-4 sm:px-6 md:px-24 py-8 sm:py-12 md:py-16 flex justify-center items-center gap-6">
-                  <div className="w-full max-w-[800px] px-4 sm:px-6 py-4 sm:py-5 shadow-[0px_2px_4px_rgba(50,45,43,0.06)] overflow-hidden rounded-lg flex flex-col justify-start items-center gap-6 shadow-none">
-                    <div className="w-full max-w-[600px] text-center flex justify-center flex-col text-[#49423D] text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight md:leading-[50px] font-sans tracking-tight">
-                      About MediTrust
-                    </div>
-                    <div className="self-stretch text-center text-[#605A57] text-base sm:text-lg font-normal leading-7 sm:leading-8 font-sans">
-                      MediTrust leverages Hedera Hashgraph, a next-generation distributed ledger technology, 
-                      to secure prescription data with unprecedented speed, security, and sustainability. 
-                      Built on the world's most advanced DLT platform, MediTrust ensures that every prescription 
-                      is immutable, verifiable, and protected against fraud while maintaining the highest standards 
-                      of privacy and compliance in healthcare.
-                    </div>
-                    <div className="flex justify-center items-center gap-4">
-                      <div className="px-6 py-3 bg-[#37322F] shadow-[0px_2px_4px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center">
-                        <div className="w-full h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0.20)] to-[rgba(0,0,0,0.10)] mix-blend-multiply"></div>
-                        <div className="flex flex-col justify-center text-white text-sm font-medium leading-5 font-sans">
-                          Learn More
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -406,7 +379,7 @@ export default function LandingPage() {
                     <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
                       {Array.from({ length: 50 }).map((_, i) => (
                         <div
-                          key={`pattern-${i}`}
+                          key={i}
                           className="self-stretch h-3 sm:h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                         />
                       ))}
@@ -457,7 +430,7 @@ export default function LandingPage() {
                     <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
                       {Array.from({ length: 50 }).map((_, i) => (
                         <div
-                          key={`pattern-${i}`}
+                          key={i}
                           className="self-stretch h-3 sm:h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                         />
                       ))}
@@ -500,7 +473,7 @@ export default function LandingPage() {
                     <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
                       {Array.from({ length: 200 }).map((_, i) => (
                         <div
-                          key={`pattern-${i}`}
+                          key={i}
                           className="self-stretch h-3 sm:h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                         />
                       ))}
@@ -604,7 +577,7 @@ export default function LandingPage() {
                     <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
                       {Array.from({ length: 200 }).map((_, i) => (
                         <div
-                          key={`pattern-${i}`}
+                          key={i}
                           className="self-stretch h-3 sm:h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                         />
                       ))}

@@ -114,7 +114,7 @@ export default function PricingSection() {
             <div className="w-[162px] left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
               {Array.from({ length: 200 }).map((_, i) => (
                 <div
-                  key={`pricing-pattern-${i}`}
+                  key={i}
                   className="self-stretch h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                 ></div>
               ))}
@@ -374,7 +374,7 @@ export default function PricingSection() {
             <div className="w-[162px] left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
               {Array.from({ length: 200 }).map((_, i) => (
                 <div
-                  key={`pricing-pattern-${i}`}
+                  key={i}
                   className="self-stretch h-4 rotate-[-45deg] origin-top-left outline outline-[0.5px] outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
                 ></div>
               ))}
