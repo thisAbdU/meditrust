@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { authService } from '@/lib/supabase/auth-utils'
 
 interface FormData {
   name: string
@@ -119,27 +120,45 @@ export default function DoctorSignUp() {
     }
 
     try {
-      // Mock API call - in real app, this would be an actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate 2-second delay
-      
-      // Mock email already exists check
-      const existingEmails = ['doctor@example.com', 'test@meditrust.com']
-      if (existingEmails.includes(formData.email.toLowerCase())) {
-        setErrors({ general: 'An account with this email already exists' })
+      // Use Supabase authentication for signup
+      const { data, error } = await authService.signUp({
+        email: formData.email,
+        password: formData.password,
+        full_name: formData.name,
+        role: 'doctor'
+      })
+
+      if (error) {
+        setErrors({ general: error.message || 'Failed to create account. Please try again.' })
         setLoading(false)
         return
       }
 
-      // Mock successful signup
-      setSuccess(true)
-      
-      // Mock email verification (in real app, this would send actual email)
-      setTimeout(() => {
-        setSuccess(false)
-        router.push('/doctor/dashboard')
-      }, 3000)
+      if (data?.user) {
+        // Create doctor-specific profile
+        const { error: profileError } = await authService.createRoleProfile('doctor', {
+          license_number: formData.medicalLicense,
+          specialization: '', // Can be added later
+          hospital_affiliation: '', // Can be added later
+          years_of_experience: null // Can be added later
+        })
 
-    } catch (error) {
+        if (profileError) {
+          console.error('Failed to create doctor profile:', profileError)
+          // Don't fail the signup, just log the error
+        }
+
+        // Show success message
+        setSuccess(true)
+        
+        // Redirect after showing success message
+        setTimeout(() => {
+          setSuccess(false)
+          router.push('/doctor/dashboard')
+        }, 3000)
+      }
+
+    } catch (error: any) {
       setErrors({ general: 'An unexpected error occurred. Please try again.' })
     } finally {
       setLoading(false)

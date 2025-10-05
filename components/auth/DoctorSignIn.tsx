@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { authService } from '@/lib/supabase/auth-utils'
 
 interface FormData {
   email: string
@@ -14,13 +15,6 @@ interface FormErrors {
   general?: string
 }
 
-interface LoginAttempt {
-  email: string
-  attempts: number
-  lastAttempt: number
-  lockedUntil?: number
-}
-
 export default function DoctorSignIn() {
   const router = useRouter()
   const [formData, setFormData] = useState<FormData>({
@@ -31,15 +25,6 @@ export default function DoctorSignIn() {
   const [loading, setLoading] = useState(false)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
 
-  // Track login attempts (in real app, this would be server-side)
-  const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([])
-
-  // Mock user database
-  const mockUsers = [
-    { email: 'doctor@example.com', password: 'SecurePass123!', name: 'Dr. John Smith' },
-    { email: 'test@meditrust.com', password: 'TestPass456!', name: 'Dr. Jane Doe' }
-  ]
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -48,47 +33,6 @@ export default function DoctorSignIn() {
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }))
     }
-  }
-
-  const isAccountLocked = (email: string): boolean => {
-    const attempt = loginAttempts.find(att => att.email === email)
-    if (!attempt) return false
-    
-    if (attempt.lockedUntil && Date.now() < attempt.lockedUntil) {
-      return true
-    }
-    return false
-  }
-
-  const getRemainingLockTime = (email: string): number => {
-    const attempt = loginAttempts.find(att => att.email === email)
-    if (!attempt?.lockedUntil) return 0
-    
-    return Math.max(0, Math.ceil((attempt.lockedUntil - Date.now()) / 1000 / 60))
-  }
-
-  const recordFailedAttempt = (email: string) => {
-    setLoginAttempts(prev => {
-      const existing = prev.find(att => att.email === email)
-      const now = Date.now()
-      
-      if (existing) {
-        const newAttempts = existing.attempts + 1
-        const lockedUntil = newAttempts >= 5 ? now + (15 * 60 * 1000) : undefined // 15 minutes
-        
-        return prev.map(att => 
-          att.email === email 
-            ? { ...att, attempts: newAttempts, lastAttempt: now, lockedUntil }
-            : att
-        )
-      } else {
-        return [...prev, { email, attempts: 1, lastAttempt: now }]
-      }
-    })
-  }
-
-  const clearFailedAttempts = (email: string) => {
-    setLoginAttempts(prev => prev.filter(att => att.email !== email))
   }
 
   const validateForm = (): boolean => {
@@ -118,45 +62,42 @@ export default function DoctorSignIn() {
       return
     }
 
-    // Check if account is locked
-    if (isAccountLocked(formData.email)) {
-      const remainingTime = getRemainingLockTime(formData.email)
-      setErrors({ 
-        general: `Account is locked due to too many failed attempts. Please try again in ${remainingTime} minutes.` 
-      })
-      setLoading(false)
-      return
-    }
-
     try {
-      // Simulate API delay (max 3 seconds as per requirements)
-      const startTime = Date.now()
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 1000)) // 1-3 seconds
-      
-      // Mock authentication
-      const user = mockUsers.find(u => u.email.toLowerCase() === formData.email.toLowerCase())
-      
-      if (!user || user.password !== formData.password) {
-        recordFailedAttempt(formData.email)
-        setErrors({ general: 'Incorrect email or password.' })
+      // Use Supabase authentication
+      const { data, error } = await authService.signIn({
+        email: formData.email,
+        password: formData.password
+      })
+
+      if (error) {
+        setErrors({ general: error.message || 'Incorrect email or password.' })
         setLoading(false)
         return
       }
 
-      // Successful login
-      clearFailedAttempts(formData.email)
-      
-      // Store user session (in real app, this would be handled by auth provider)
-      localStorage.setItem('doctorUser', JSON.stringify({
-        email: user.email,
-        name: user.name,
-        loginTime: Date.now()
-      }))
+      if (data?.user) {
+        // Get user profile to verify role
+        const { user: currentUser, error: profileError } = await authService.getCurrentUser()
+        
+        if (profileError || !currentUser) {
+          setErrors({ general: 'Failed to load user profile. Please try again.' })
+          setLoading(false)
+          return
+        }
 
-      // Redirect to dashboard
-      router.push('/doctor/dashboard')
+        // Verify user is a doctor
+        if (currentUser.profile.role !== 'doctor') {
+          await authService.signOut() // Sign out if not a doctor
+          setErrors({ general: 'Access denied. This account is not authorized for doctor access.' })
+          setLoading(false)
+          return
+        }
 
-    } catch (error) {
+        // Successful login - redirect to dashboard
+        router.push('/doctor/dashboard')
+      }
+
+    } catch (error: any) {
       setErrors({ general: 'An unexpected error occurred. Please try again.' })
     } finally {
       setLoading(false)
@@ -196,7 +137,7 @@ export default function DoctorSignIn() {
                 : 'border-[#E0DEDB] focus:ring-[#37322F] focus:border-[#37322F]'
             }`}
             placeholder="doctor@example.com"
-            disabled={isAccountLocked(formData.email)}
+            disabled={loading}
           />
           {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
         </div>
@@ -217,18 +158,11 @@ export default function DoctorSignIn() {
                 : 'border-[#E0DEDB] focus:ring-[#37322F] focus:border-[#37322F]'
             }`}
             placeholder="Enter your password"
-            disabled={isAccountLocked(formData.email)}
+            disabled={loading}
           />
           {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
         </div>
 
-        {isAccountLocked(formData.email) && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">
-              Account locked due to too many failed attempts. Please try again in {getRemainingLockTime(formData.email)} minutes.
-            </p>
-          </div>
-        )}
 
         {errors.general && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
@@ -238,7 +172,7 @@ export default function DoctorSignIn() {
 
         <button
           type="submit"
-          disabled={loading || isAccountLocked(formData.email)}
+          disabled={loading}
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#37322F] hover:bg-[#2a2522] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#37322F] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
@@ -285,15 +219,6 @@ export default function DoctorSignIn() {
         </div>
       )}
 
-      {/* Demo credentials info */}
-      <div className="mt-6 p-4 bg-[#F7F5F3] rounded-md border border-[#E0DEDB]">
-        <h3 className="text-sm font-medium text-[#37322F] mb-2">Demo Credentials:</h3>
-        <div className="text-xs text-[#605A57] space-y-1">
-          <p><strong>Email:</strong> doctor@example.com</p>
-          <p><strong>Password:</strong> SecurePass123!</p>
-          <p className="text-[#605A57] mt-2">Or try: test@meditrust.com / TestPass456!</p>
-        </div>
-      </div>
     </div>
   )
 }
