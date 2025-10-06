@@ -54,7 +54,7 @@ export default function PatientSignUp() {
       return
     }
 
-    // Create account (local mock). In production, call backend/Supabase.
+    // Create account (local mock). In production, call backend API.
     const newUser: PatientUser = { name: formData.name, email: formData.email, phone: formData.phone }
     localStorage.setItem("patientRegistry", JSON.stringify([...registry, newUser]))
     localStorage.setItem("patientUser", JSON.stringify(newUser))

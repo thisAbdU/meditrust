@@ -1,10 +1,10 @@
--- MediTrust Database Schema for Supabase
--- Run this in your Supabase SQL Editor
+-- MediTrust Database Schema
+-- Database schema for the MediTrust application
 
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- User profiles table (extends Supabase auth.users)
+-- User profiles table
 CREATE TABLE IF NOT EXISTS user_profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
