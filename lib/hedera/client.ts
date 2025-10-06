@@ -1,17 +1,26 @@
 import { Client, AccountId, PrivateKey } from '@hashgraph/sdk'
 
 // Hedera network configuration
-export const HEDERA_NETWORKS = {
-  testnet: 'https://testnet.hashio.io/api',
-  mainnet: 'https://mainnet.hashio.io/api',
-  previewnet: 'https://previewnet.hashio.io/api'
-} as const
-
-export type HederaNetwork = keyof typeof HEDERA_NETWORKS
+export type HederaNetwork = 'testnet' | 'mainnet' | 'previewnet'
 
 // Create Hedera client
 export function createHederaClient(network: HederaNetwork = 'testnet') {
-  const client = Client.forNetwork({ [network]: HEDERA_NETWORKS[network] })
+  let client: Client
+  
+  // Use the proper Hedera SDK network methods
+  switch (network) {
+    case 'testnet':
+      client = Client.forTestnet()
+      break
+    case 'mainnet':
+      client = Client.forMainnet()
+      break
+    case 'previewnet':
+      client = Client.forPreviewnet()
+      break
+    default:
+      client = Client.forTestnet()
+  }
   
   // Debug environment variables
   console.log('🔍 Checking Hedera environment variables:')
